@@ -1,0 +1,78 @@
+### REST API Requests for Posts and Comments
+### Base URL: http://localhost:3000
+
+### ============================================
+### POSTS API ENDPOINTS
+### ============================================
+
+### 1. Add a New Post
+POST http://localhost:3000/post
+Content-Type: application/json
+
+{
+  "title": "My New Post",
+  "content": "This is the content of my new post",
+  "sender": 1
+}
+
+### 2. Get All Posts
+GET http://localhost:3000/post
+
+### 3. Get a Post by ID
+GET http://localhost:3000/post/1
+
+### 4. Get Posts by Sender
+GET http://localhost:3000/post?sender=1
+
+### 5. Update a Post
+PUT http://localhost:3000/post/1
+Content-Type: application/json
+
+{
+  "title": "Updated Post Title",
+  "content": "Updated post content",
+  "sender": 1
+}
+
+### ============================================
+### COMMENTS API ENDPOINTS
+### ============================================
+
+### 6. Create a New Comment
+POST http://localhost:3000/comment
+Content-Type: application/json
+
+{
+  "content": "This is a new comment",
+  "postId": 1,
+  "userId": 1
+}
+
+### 7. Get All Comments
+GET http://localhost:3000/comment
+
+### 8. Get Comment by ID
+GET http://localhost:3000/comment/1
+
+### 9. Get Comments by Post ID
+GET http://localhost:3000/comment?post=1
+
+### 10. Update a Comment
+PUT http://localhost:3000/comment/1
+Content-Type: application/json
+
+{
+  "content": "Updated comment content",
+  "userId": 1
+}
+
+### 11. Delete a Comment
+DELETE http://localhost:3000/comment/1
+
+### ============================================
+### ROOT ENDPOINT
+### ============================================
+
+### Get API Information
+GET http://localhost:3000/
+
