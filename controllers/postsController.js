@@ -1,62 +1,89 @@
-const { posts } = require('../data/store');
+const mongoose = require('mongoose');
+const Post = require('../models/Post');
 
-const getPosts = (req, res) => {
-  res.json(posts);
-};
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-const getPostById = (req, res) => {
-  const postId = parseInt(req.params.post_id);
-  const post = posts.find(p => p.id === postId);
-  
-  if (!post) {
-    return res.status(404).json({ error: 'Post not found' });
+const getPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  
-  res.json(post);
 };
 
-const getPostsBySender = (req, res) => {
-  const senderId = parseInt(req.query.sender);
-  const filteredPosts = posts.filter(p => p.sender === senderId);
-  res.json(filteredPosts);
-};
+const getPostById = async (req, res) => {
+  try {
+    if (!isValidObjectId(req.params.post_id)) {
+      return res.status(400).json({ error: 'Invalid post ID format' });
+    }
 
-const addPost = (req, res) => {
-  const { title, content, sender } = req.body;
-  
-  if (!title || !content || sender === undefined) {
-    return res.status(400).json({ error: 'Missing required fields: title, content, sender' });
+    const post = await Post.findById(req.params.post_id);
+    
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  
-  const newPost = {
-    id: posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1,
-    title,
-    content,
-    sender: parseInt(sender),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  
-  posts.push(newPost);
-  res.status(201).json(newPost);
 };
 
-const updatePost = (req, res) => {
-  const postId = parseInt(req.params.post_id);
-  const postIndex = posts.findIndex(p => p.id === postId);
-  
-  if (postIndex === -1) {
-    return res.status(404).json({ error: 'Post not found' });
+const getPostsBySender = async (req, res) => {
+  try {
+    const senderId = parseInt(req.query.sender);
+    const posts = await Post.find({ sender: senderId }).sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  
-  const { title, content, sender } = req.body;
-  
-  if (title !== undefined) posts[postIndex].title = title;
-  if (content !== undefined) posts[postIndex].content = content;
-  if (sender !== undefined) posts[postIndex].sender = parseInt(sender);
-  posts[postIndex].updatedAt = new Date().toISOString();
-  
-  res.json(posts[postIndex]);
+};
+
+const addPost = async (req, res) => {
+  try {
+    const { title, content, sender } = req.body;
+    
+    if (!title || !content || sender === undefined) {
+      return res.status(400).json({ error: 'Missing required fields: title, content, sender' });
+    }
+    
+    const newPost = new Post({
+      title,
+      content,
+      sender: parseInt(sender)
+    });
+    
+    const savedPost = await newPost.save();
+    res.status(201).json(savedPost);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updatePost = async (req, res) => {
+  try {
+    const { title, content, sender } = req.body;
+
+    if (!isValidObjectId(req.params.post_id)) {
+      return res.status(400).json({ error: 'Invalid post ID format' });
+    }
+    
+    const post = await Post.findById(req.params.post_id);
+    
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    
+    if (title !== undefined) post.title = title;
+    if (content !== undefined) post.content = content;
+    if (sender !== undefined) post.sender = parseInt(sender);
+    
+    const updatedPost = await post.save();
+    res.json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 module.exports = {
@@ -66,4 +93,3 @@ module.exports = {
   addPost,
   updatePost
 };
-
