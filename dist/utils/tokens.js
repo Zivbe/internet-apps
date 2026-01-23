@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.hashToken = exports.decodeToken = exports.verifyRefreshToken = exports.verifyAccessToken = exports.signRefreshToken = exports.signAccessToken = void 0;
+const crypto_1 = __importDefault(require("crypto"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const getAccessTokenSecret = () => process.env.ACCESS_TOKEN_SECRET || 'access-secret';
+const getRefreshTokenSecret = () => process.env.REFRESH_TOKEN_SECRET || 'refresh-secret';
+const getAccessTokenTtl = () => process.env.ACCESS_TOKEN_TTL || '15m';
+const getRefreshTokenTtl = () => process.env.REFRESH_TOKEN_TTL || '7d';
+const signAccessToken = (userId) => jsonwebtoken_1.default.sign({ sub: userId }, getAccessTokenSecret(), { expiresIn: getAccessTokenTtl() });
+exports.signAccessToken = signAccessToken;
+const signRefreshToken = (userId) => jsonwebtoken_1.default.sign({ sub: userId }, getRefreshTokenSecret(), { expiresIn: getRefreshTokenTtl() });
+exports.signRefreshToken = signRefreshToken;
+const verifyAccessToken = (token) => jsonwebtoken_1.default.verify(token, getAccessTokenSecret());
+exports.verifyAccessToken = verifyAccessToken;
+const verifyRefreshToken = (token) => jsonwebtoken_1.default.verify(token, getRefreshTokenSecret());
+exports.verifyRefreshToken = verifyRefreshToken;
+const decodeToken = (token) => jsonwebtoken_1.default.decode(token);
+exports.decodeToken = decodeToken;
+const hashToken = (token) => crypto_1.default.createHash('sha256').update(token).digest('hex');
+exports.hashToken = hashToken;

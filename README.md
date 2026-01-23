@@ -1,123 +1,114 @@
-# REST API Project
+# REST API Project (Assignment 1 Refactor)
 
-A REST API built with Node.js and Express for managing Posts and Comments.
+Production-ready REST API in TypeScript with full user management, relational modeling (Users, Posts, Comments), JWT authentication with refresh tokens, Swagger docs, and Jest tests.
 
 ## Features
 
-### Posts API
-- **POST** `/post` - Add a new post
-- **GET** `/post` - Get all posts
-- **GET** `/post/:post_id` - Get a post by ID
-- **GET** `/post?sender=<sender_id>` - Get posts by sender ID
-- **PUT** `/post/:post_id` - Update a post
+- Users: full CRUD (`username`, `email`)
+- Posts: Users can create posts
+- Comments: Users can comment on posts
+- Auth: register, login, refresh, logout with JWT access + refresh tokens
+- Swagger docs at `/docs`
+- Jest tests covering all endpoints
 
-### Comments API (Full CRUD)
-- **POST** `/comment` - Create a new comment
-- **GET** `/comment` - Get all comments
-- **GET** `/comment/:comment_id` - Get a comment by ID
-- **GET** `/comment?post=<post_id>` - Get all comments for a specific post
-- **PUT** `/comment/:comment_id` - Update a comment
-- **DELETE** `/comment/:comment_id` - Delete a comment
+## Tech Stack
 
-## Setup Instructions
+- TypeScript, Node.js, Express
+- JWT authentication with refresh tokens
+- Jest + Supertest
+- Swagger UI
 
-### Prerequisites
-- Node.js installed
-- MongoDB (local or MongoDB Atlas account)
-
-See `MONGODB_SETUP.md` for detailed MongoDB setup instructions.
+## Setup
 
 ### Installation
 
-1. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Set up environment variables:
-```bash
-cp .env.example .env
-```
-Then edit `.env` and add your MongoDB connection string.
+### Environment Variables
 
-3. Start the server:
+Create a `.env` file (optional; defaults are provided):
+
 ```bash
+PORT=3000
+ACCESS_TOKEN_SECRET=change-me
+REFRESH_TOKEN_SECRET=change-me-too
+ACCESS_TOKEN_TTL=15m
+REFRESH_TOKEN_TTL=7d
+```
+
+### Run
+
+```bash
+npm run dev
+```
+
+The server starts at `http://localhost:3000` and Swagger UI is at `http://localhost:3000/docs`.
+
+### Production Build
+
+```bash
+npm run build
 npm start
 ```
 
-The server will run on `http://localhost:3000`
+## Scripts
 
-## Testing the API
+- `npm run dev` - Run in development mode
+- `npm run build` - Compile TypeScript
+- `npm start` - Run compiled server
+- `npm test` - Run Jest tests
 
-All API requests are documented in the `request.rest` file. You can use this file with REST Client extensions to test the endpoints.
+## API Endpoints
 
-Alternatively, you can use curl
+### Auth
+- **POST** `/auth/register`
+- **POST** `/auth/login`
+- **POST** `/auth/refresh`
+- **POST** `/auth/logout`
+
+### Users
+- **GET** `/users`
+- **GET** `/users/:userId`
+- **POST** `/users`
+- **PUT** `/users/:userId`
+- **DELETE** `/users/:userId`
+
+### Posts
+- **GET** `/post`
+- **GET** `/post/:postId`
+- **POST** `/post`
+- **PUT** `/post/:postId`
+- **DELETE** `/post/:postId`
+
+### Comments
+- **GET** `/comment`
+- **GET** `/comment/:commentId`
+- **POST** `/comment`
+- **PUT** `/comment/:commentId`
+- **DELETE** `/comment/:commentId`
 
 ## Project Structure
 
 ```
-rest-api-project/
-├── server.js              # Main server file
-├── config/
-│   └── database.js       # MongoDB connection
-├── models/
-│   ├── Post.js           # Post Mongoose model
-│   └── Comment.js        # Comment Mongoose model
-├── routes/
-│   ├── posts.js          # Posts routes
-│   └── comments.js       # Comments routes
-├── controllers/
-│   ├── postsController.js    # Posts business logic
-│   └── commentsController.js # Comments business logic
-├── data/
-│   └── store.js          # Legacy in-memory store (not used with MongoDB)
-├── request.rest          # API request documentation
-├── .env.example          # Environment variables template
+internet-apps/
+├── src/
+│   ├── app.ts
+│   ├── index.ts
+│   ├── docs/
+│   ├── middleware/
+│   ├── routes/
+│   ├── store/
+│   └── utils/
+├── tests/
+├── jest.config.ts
+├── tsconfig.json
 ├── package.json
 └── README.md
 ```
 
-## Data Models
+## Notes
 
-### Post
-```json
-{
-  "id": "507f1f77bcf86cd799439011",
-  "title": "Post Title",
-  "content": "Post content",
-  "sender": 1,
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-### Comment
-```json
-{
-  "id": "507f1f77bcf86cd799439012",
-  "content": "Comment content",
-  "postId": "507f1f77bcf86cd799439011",
-  "userId": 1,
-  "createdAt": "2024-01-01T00:00:00.000Z",
-  "updatedAt": "2024-01-01T00:00:00.000Z"
-}
-```
-
-**Note:** IDs are now MongoDB ObjectIds (strings), not integers.
-
-## Collaboration
-
-This project uses Git for version control. When working collaboratively:
-1. Create a feature branch for your changes
-2. Implement your assigned endpoints
-3. Submit a pull request for review
-4. Merge after approval
-
-## Database
-
-This project uses **MongoDB** with Mongoose ODM. Data is persisted in MongoDB and will survive server restarts.
-
-- For local development, install MongoDB locally or use MongoDB Atlas (free tier available)
-- See `MONGODB_SETUP.md` for detailed setup instructions
-- Connection string is configured in `.env` file
+- The current data layer is an in-memory store that models relationships between users, posts, and comments for the Assignment 1 baseline. Swap the store for a database adapter to persist data in production.
 
